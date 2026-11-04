@@ -1,13 +1,208 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loan Simulator</title>
 </head>
+
 <body>
 
     <h1>Loan Simulator</h1>
+
+    <!-- INPUTS DEL PRÉSTAMO -->
+
+    <h2>Loan Information</h2>
+
+    <label for="monto">Loan Amount:</label>
+    <input type="number" id="monto" min="0.01" step="any" placeholder="Enter loan amount">
+
+    <br><br>
+
+    <label for="tasa">Interest Rate (%):</label>
+    <input type="number" id="tasa" min="0" step="any" placeholder="Enter interest rate">
+
+    <br><br>
+
+    <label for="tipoTasa">Interest Rate Type:</label>
+    <select id="tipoTasa">
+        <option value="EM">Effective Monthly (EM)</option>
+        <option value="EA">Effective Annual (EA)</option>
+    </select>
+
+    <br><br>
+
+    <label for="plazo">Loan Term (Months):</label>
+    <input type="number" id="plazo" min="1" step="1" placeholder="Enter number of months">
+
+    <br><br>
+
+    <button onclick="calcularPrestamo()">Calculate Loan</button>
+
+    <!-- RESULTADOS -->
+
+    <h2>Loan Summary</h2>
+
+    <p id="cuota"></p>
+    <p id="totalIntereses"></p>
+    <p id="totalPagar"></p>
+    <p id="tasaMensual"></p>
+
+    <!-- TABLA DE AMORTIZACION -->
+
+    <h2>Amortization Schedule</h2>
+
+    <table border="1" id="tablaAmortizacion">
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Initial Balance</th>
+                <th>Monthly Payment</th>
+                <th>Interest</th>
+                <th>Principal</th>
+                <th>Remaining Balance</th>
+            </tr>
+        </thead>
+
+        <tbody id="resultadoTabla">
+        </tbody>
+    </table>
+
+    <script>
+
+        function calcularPrestamo() {
+
+            // Obtener valores ingresados
+
+            const monto = parseFloat(document.getElementById("monto").value);
+            const tasa = parseFloat(document.getElementById("tasa").value);
+            const tipoTasa = document.getElementById("tipoTasa").value;
+            const plazo = parseInt(document.getElementById("plazo").value);
+
+            // Validar información
+
+            if (
+                !Number.isFinite(monto) || monto <= 0 ||
+                !Number.isFinite(tasa) || tasa < 0 ||
+                !Number.isInteger(plazo) || plazo <= 0
+            ) {
+                alert("Please enter valid loan information.");
+                return;
+            }
+
+            // Convertir porcentaje a decimal
+
+            const tasaDecimal = tasa / 100;
+
+            // Convertir tasa a efectiva mensual
+
+            let tasaMensual;
+
+            if (tipoTasa === "EM") {
+                tasaMensual = tasaDecimal;
+            } else {
+                tasaMensual = Math.pow(1 + tasaDecimal, 1 / 12) - 1;
+            }
+
+            // Calcular cuota mensual (sistema francés)
+
+            let cuota;
+
+            if (tasaMensual === 0) {
+                cuota = monto / plazo;
+            } else {
+                cuota = monto * tasaMensual /
+                    (1 - Math.pow(1 + tasaMensual, -plazo));
+            }
+
+            // Inicializar variables
+
+            let saldo = monto;
+            let interesesTotales = 0;
+            let totalPagado = 0;
+
+            const tabla = document.getElementById("resultadoTabla");
+
+            // Limpiar tabla anterior
+
+            tabla.innerHTML = "";
+
+            // Formato de moneda
+
+            const formatoMoneda = new Intl.NumberFormat("es-CO", {
+                style: "currency",
+                currency: "COP",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            // Generar tabla de amortización
+
+            for (let mes = 1; mes <= plazo; mes++) {
+
+                const saldoInicial = saldo;
+
+                // Calcular interés del mes
+
+                const interes = saldoInicial * tasaMensual;
+
+                // Calcular abono a capital
+
+                let abonoCapital = cuota - interes;
+
+                // Ajustar la última cuota para cerrar el saldo
+
+                let cuotaActual = cuota;
+
+                if (mes === plazo) {
+                    abonoCapital = saldoInicial;
+                    cuotaActual = abonoCapital + interes;
+                }
+
+                // Calcular saldo pendiente
+
+                saldo = Math.max(0, saldoInicial - abonoCapital);
+
+                // Acumular valores
+
+                interesesTotales += interes;
+                totalPagado += cuotaActual;
+
+                // Crear fila
+
+                const fila = document.createElement("tr");
+
+                fila.innerHTML = `
+                    <td>${mes}</td>
+                    <td>${formatoMoneda.format(saldoInicial)}</td>
+                    <td>${formatoMoneda.format(cuotaActual)}</td>
+                    <td>${formatoMoneda.format(interes)}</td>
+                    <td>${formatoMoneda.format(abonoCapital)}</td>
+                    <td>${formatoMoneda.format(saldo)}</td>
+                `;
+
+                tabla.appendChild(fila);
+            }
+
+            // Mostrar resumen del préstamo
+
+            document.getElementById("cuota").textContent =
+                "Monthly Payment: " + formatoMoneda.format(cuota);
+
+            document.getElementById("totalIntereses").textContent =
+                "Total Interest: " + formatoMoneda.format(interesesTotales);
+
+            document.getElementById("totalPagar").textContent =
+                "Total Amount Paid: " + formatoMoneda.format(totalPagado);
+
+            document.getElementById("tasaMensual").textContent =
+                "Effective Monthly Rate: " +
+                (tasaMensual * 100).toFixed(4) + "%";
+
+        }
+
+    </script>
 
 </body>
 </html>
