@@ -5,204 +5,792 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loan Simulator</title>
+
+    <style>
+        /* GENERAL */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: #f3f5f8;
+            color: #202b3c;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        /* HEADER */
+        header {
+            margin-bottom: 32px;
+        }
+
+        .brand {
+            color: #52647a;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        header h1 {
+            font-size: 34px;
+            font-weight: 750;
+            color: #17263c;
+            margin-bottom: 9px;
+        }
+
+        header p {
+            color: #778397;
+            font-size: 15px;
+        }
+
+        /* CARDS */
+        .card {
+            background: white;
+            border: 1px solid #e6eaf0;
+            border-radius: 14px;
+            padding: 27px;
+            box-shadow: 0 4px 16px rgba(25, 42, 65, 0.04);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 22px;
+            color: #1d2b40;
+        }
+
+        /* INPUT SECTION */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 650;
+            color: #566479;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dce2ea;
+            border-radius: 8px;
+            background: #fbfcfe;
+            color: #25364c;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #426a9e;
+            box-shadow: 0 0 0 3px rgba(66, 106, 158, 0.10);
+        }
+
+        .input-hint {
+            font-size: 11px;
+            color: #929eae;
+        }
+
+        /* BUTTONS */
+        .button-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 13px 25px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 650;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .calculate-btn {
+            background: #203b5c;
+            color: white;
+        }
+
+        .calculate-btn:hover {
+            background: #31567e;
+            transform: translateY(-1px);
+        }
+
+        .reset-btn {
+            background: #edf1f5;
+            color: #526176;
+        }
+
+        .reset-btn:hover {
+            background: #e0e6ed;
+        }
+
+        /* SUMMARY */
+        .summary-section {
+            margin-top: 25px;
+            display: none;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 17px;
+        }
+
+        .summary-card {
+            padding: 23px;
+            background: #fff;
+            border: 1px solid #e5eaf0;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(25, 42, 65, 0.03);
+        }
+
+        .summary-label {
+            color: #7b8798;
+            font-size: 12px;
+            font-weight: 650;
+            margin-bottom: 13px;
+        }
+
+        .summary-value {
+            color: #1d3554;
+            font-size: 23px;
+            font-weight: 750;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-description {
+            color: #9aa4b2;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .main-summary {
+            background: #203b5c;
+            border-color: #203b5c;
+        }
+
+        .main-summary .summary-label,
+        .main-summary .summary-description {
+            color: #c0cfdf;
+        }
+
+        .main-summary .summary-value {
+            color: white;
+        }
+
+        /* EXTRA INFORMATION */
+        .extra-info {
+            margin-top: 17px;
+            padding: 18px 22px;
+            background: #f7f9fc;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            color: #68768a;
+        }
+
+        .extra-info strong {
+            color: #263b56;
+        }
+
+        /* AMORTIZATION TABLE */
+        .table-section {
+            margin-top: 25px;
+            display: none;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .table-header h2 {
+            font-size: 18px;
+            color: #1d2b40;
+        }
+
+        .table-header p {
+            color: #8995a5;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid #e8edf2;
+            border-radius: 9px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 780px;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        thead {
+            background: #f2f5f9;
+        }
+
+        th {
+            padding: 15px 13px;
+            color: #56657a;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px;
+            border-top: 1px solid #edf0f4;
+            color: #58677a;
+            white-space: nowrap;
+        }
+
+        th:first-child, td:first-child {
+            text-align: center;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .balance-cell {
+            font-weight: 700;
+            color: #203b5c;
+        }
+
+        .table-footer {
+            padding: 16px;
+            background: #f7f9fc;
+            border-top: 1px solid #e7ebf1;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            color: #596a80;
+            font-size: 12px;
+        }
+
+        /* ERROR MESSAGE */
+        .error {
+            display: none;
+            color: #b83e3e;
+            background: #fff1f1;
+            border: 1px solid #f2d0d0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 11px;
+            color: #9aa4b2;
+            line-height: 1.6;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            body {
+                padding: 25px 13px;
+            }
+
+            header h1 {
+                font-size: 27px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-value {
+                font-size: 22px;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+    </style>
 </head>
 
 <body>
 
-    <h1>Loan Simulator</h1>
+<div class="container">
 
-    <!-- INPUTS DEL PRÉSTAMO -->
+    <!-- HEADER -->
 
-    <h2>Loan Information</h2>
+    <header>
+        <div class="brand">Financial Tools</div>
+        <h1>Loan Simulator</h1>
+        <p>Calculate your loan payments and visualize your amortization schedule.</p>
+    </header>
 
-    <label for="monto">Loan Amount:</label>
-    <input type="number" id="monto" min="0.01" step="any" placeholder="Enter loan amount">
 
-    <br><br>
+    <!-- LOAN INPUTS -->
 
-    <label for="tasa">Interest Rate (%):</label>
-    <input type="number" id="tasa" min="0" step="any" placeholder="Enter interest rate">
+    <section class="card">
 
-    <br><br>
+        <h2 class="section-title">Loan Information</h2>
 
-    <label for="tipoTasa">Interest Rate Type:</label>
-    <select id="tipoTasa">
-        <option value="EM">Effective Monthly (EM)</option>
-        <option value="EA">Effective Annual (EA)</option>
-    </select>
+        <div class="input-grid">
 
-    <br><br>
+            <div class="form-group">
+                <label for="monto">Loan Amount (COP)</label>
+                <input
+                    type="number"
+                    id="monto"
+                    min="0.01"
+                    step="any"
+                    placeholder="e.g. 50000000"
+                >
+                <span class="input-hint">Enter the total amount borrowed.</span>
+            </div>
 
-    <label for="plazo">Loan Term (Months):</label>
-    <input type="number" id="plazo" min="1" step="1" placeholder="Enter number of months">
+            <div class="form-group">
+                <label for="tasa">Interest Rate (%)</label>
+                <input
+                    type="number"
+                    id="tasa"
+                    min="0"
+                    step="any"
+                    placeholder="e.g. 12"
+                >
+                <span class="input-hint">Enter the annual or monthly rate.</span>
+            </div>
 
-    <br><br>
+            <div class="form-group">
+                <label for="tipoTasa">Interest Rate Type</label>
+                <select id="tipoTasa">
+                    <option value="EA">Effective Annual (EA)</option>
+                    <option value="EM">Effective Monthly (EM)</option>
+                </select>
+                <span class="input-hint">Select how the interest rate is expressed.</span>
+            </div>
 
-    <button onclick="calcularPrestamo()">Calculate Loan</button>
+            <div class="form-group">
+                <label for="plazo">Loan Term (Months)</label>
+                <input
+                    type="number"
+                    id="plazo"
+                    min="1"
+                    step="1"
+                    placeholder="e.g. 36"
+                >
+                <span class="input-hint">Enter the total number of monthly payments.</span>
+            </div>
 
-    <!-- RESULTADOS -->
+        </div>
 
-    <h2>Loan Summary</h2>
+        <div class="error" id="error"></div>
 
-    <p id="cuota"></p>
-    <p id="totalIntereses"></p>
-    <p id="totalPagar"></p>
-    <p id="tasaMensual"></p>
+        <div class="button-container">
+            <button class="calculate-btn" onclick="calcularPrestamo()">
+                Calculate Loan →
+            </button>
 
-    <!-- TABLA DE AMORTIZACION -->
+            <button class="reset-btn" onclick="reiniciar()">
+                Reset
+            </button>
+        </div>
 
-    <h2>Amortization Schedule</h2>
+    </section>
 
-    <table border="1" id="tablaAmortizacion">
-        <thead>
-            <tr>
-                <th>Month</th>
-                <th>Initial Balance</th>
-                <th>Monthly Payment</th>
-                <th>Interest</th>
-                <th>Principal</th>
-                <th>Remaining Balance</th>
-            </tr>
-        </thead>
 
-        <tbody id="resultadoTabla">
-        </tbody>
-    </table>
+    <!-- FINANCIAL SUMMARY -->
 
-    <script>
+    <section class="summary-section" id="summary">
 
-        function calcularPrestamo() {
+        <h2 class="section-title" style="margin-top: 30px;">
+            Loan Overview
+        </h2>
 
-            // Obtener valores ingresados
+        <div class="summary-grid">
 
-            const monto = parseFloat(document.getElementById("monto").value);
-            const tasa = parseFloat(document.getElementById("tasa").value);
-            const tipoTasa = document.getElementById("tipoTasa").value;
-            const plazo = parseInt(document.getElementById("plazo").value);
+            <div class="summary-card main-summary">
+                <div class="summary-label">Monthly Payment</div>
+                <div class="summary-value" id="cuota">$0</div>
+                <div class="summary-description">
+                    Fixed monthly installment
+                </div>
+            </div>
 
-            // Validar información
+            <div class="summary-card">
+                <div class="summary-label">Total Interest</div>
+                <div class="summary-value" id="totalIntereses">$0</div>
+                <div class="summary-description">
+                    Total interest paid over the loan term
+                </div>
+            </div>
 
-            if (
-                !Number.isFinite(monto) || monto <= 0 ||
-                !Number.isFinite(tasa) || tasa < 0 ||
-                !Number.isInteger(plazo) || plazo <= 0
-            ) {
-                alert("Please enter valid loan information.");
-                return;
-            }
+            <div class="summary-card">
+                <div class="summary-label">Total Amount Paid</div>
+                <div class="summary-value" id="totalPagar">$0</div>
+                <div class="summary-description">
+                    Principal plus total interest
+                </div>
+            </div>
 
-            // Convertir porcentaje a decimal
+        </div>
 
-            const tasaDecimal = tasa / 100;
+        <div class="extra-info">
 
-            // Convertir tasa a efectiva mensual
+            <div>
+                Monthly Rate:
+                <strong id="tasaMensual">0%</strong>
+            </div>
 
-            let tasaMensual;
+            <div>
+                Loan Term:
+                <strong id="plazoResumen">0 months</strong>
+            </div>
 
-            if (tipoTasa === "EM") {
-                tasaMensual = tasaDecimal;
-            } else {
-                tasaMensual = Math.pow(1 + tasaDecimal, 1 / 12) - 1;
-            }
+            <div>
+                Principal:
+                <strong id="capitalResumen">$0</strong>
+            </div>
 
-            // Calcular cuota mensual (sistema francés)
+        </div>
 
-            let cuota;
+    </section>
 
-            if (tasaMensual === 0) {
-                cuota = monto / plazo;
-            } else {
-                cuota = monto * tasaMensual /
-                    (1 - Math.pow(1 + tasaMensual, -plazo));
-            }
 
-            // Inicializar variables
+    <!-- AMORTIZATION TABLE -->
 
-            let saldo = monto;
-            let interesesTotales = 0;
-            let totalPagado = 0;
+    <section class="table-section" id="tableSection">
 
-            const tabla = document.getElementById("resultadoTabla");
+        <div class="card">
 
-            // Limpiar tabla anterior
+            <div class="table-header">
 
-            tabla.innerHTML = "";
+                <div>
+                    <h2>Amortization Schedule</h2>
+                    <p>Detailed breakdown of each monthly payment.</p>
+                </div>
 
-            // Formato de moneda
+            </div>
 
-            const formatoMoneda = new Intl.NumberFormat("es-CO", {
-                style: "currency",
-                currency: "COP",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+            <div class="table-wrapper">
 
-            // Generar tabla de amortización
+                <table>
 
-            for (let mes = 1; mes <= plazo; mes++) {
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Initial Balance</th>
+                            <th>Monthly Payment</th>
+                            <th>Interest</th>
+                            <th>Principal</th>
+                            <th>Remaining Balance</th>
+                        </tr>
+                    </thead>
 
-                const saldoInicial = saldo;
+                    <tbody id="resultadoTabla"></tbody>
 
-                // Calcular interés del mes
+                </table>
 
-                const interes = saldoInicial * tasaMensual;
+                <div class="table-footer">
 
-                // Calcular abono a capital
+                    <span>
+                        Total Interest:
+                        <strong id="interesTabla">$0</strong>
+                    </span>
 
-                let abonoCapital = cuota - interes;
+                    <span>
+                        Total Payments:
+                        <strong id="pagosTabla">$0</strong>
+                    </span>
 
-                // Ajustar la última cuota para cerrar el saldo
+                </div>
 
-                let cuotaActual = cuota;
+            </div>
 
-                if (mes === plazo) {
-                    abonoCapital = saldoInicial;
-                    cuotaActual = abonoCapital + interes;
-                }
+        </div>
 
-                // Calcular saldo pendiente
+    </section>
 
-                saldo = Math.max(0, saldoInicial - abonoCapital);
 
-                // Acumular valores
+    <!-- FOOTER -->
 
-                interesesTotales += interes;
-                totalPagado += cuotaActual;
+    <footer>
+        Loan Simulator © 2026<br>
+        Financial calculations are estimates and do not include
+        insurance, commissions, taxes or additional bank fees.
+    </footer>
 
-                // Crear fila
+</div>
 
-                const fila = document.createElement("tr");
 
-                fila.innerHTML = `
-                    <td>${mes}</td>
-                    <td>${formatoMoneda.format(saldoInicial)}</td>
-                    <td>${formatoMoneda.format(cuotaActual)}</td>
-                    <td>${formatoMoneda.format(interes)}</td>
-                    <td>${formatoMoneda.format(abonoCapital)}</td>
-                    <td>${formatoMoneda.format(saldo)}</td>
-                `;
+<script>
 
-                tabla.appendChild(fila);
-            }
+    // CURRENCY FORMATTER
 
-            // Mostrar resumen del préstamo
+    const formatoMoneda = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 
-            document.getElementById("cuota").textContent =
-                "Monthly Payment: " + formatoMoneda.format(cuota);
 
-            document.getElementById("totalIntereses").textContent =
-                "Total Interest: " + formatoMoneda.format(interesesTotales);
+    // LOAN CALCULATOR
 
-            document.getElementById("totalPagar").textContent =
-                "Total Amount Paid: " + formatoMoneda.format(totalPagado);
+    function calcularPrestamo() {
 
-            document.getElementById("tasaMensual").textContent =
-                "Effective Monthly Rate: " +
-                (tasaMensual * 100).toFixed(4) + "%";
+        const monto = Number(document.getElementById("monto").value);
+        const tasa = Number(document.getElementById("tasa").value);
+        const tipoTasa = document.getElementById("tipoTasa").value;
+        const plazo = Number(document.getElementById("plazo").value);
+
+        const error = document.getElementById("error");
+
+        error.style.display = "none";
+        error.textContent = "";
+
+        // VALIDATION
+
+        if (
+            document.getElementById("monto").value.trim() === "" ||
+            document.getElementById("tasa").value.trim() === "" ||
+            document.getElementById("plazo").value.trim() === "" ||
+            !Number.isFinite(monto) ||
+            !Number.isFinite(tasa) ||
+            !Number.isFinite(plazo) ||
+            monto <= 0 ||
+            tasa < 0 ||
+            !Number.isInteger(plazo) ||
+            plazo <= 0
+        ) {
+
+            error.textContent =
+                "Please enter a valid loan amount, interest rate and loan term.";
+
+            error.style.display = "block";
+
+            document.getElementById("summary").style.display = "none";
+            document.getElementById("tableSection").style.display = "none";
+
+            return;
+        }
+
+
+        // INTEREST RATE CONVERSION
+
+        const tasaDecimal = tasa / 100;
+
+        let tasaMensual;
+
+        if (tipoTasa === "EA") {
+
+            tasaMensual = Math.pow(1 + tasaDecimal, 1 / 12) - 1;
+
+        } else {
+
+            tasaMensual = tasaDecimal;
 
         }
 
-    </script>
+
+        // MONTHLY PAYMENT CALCULATION
+
+        let cuota;
+
+        if (tasaMensual === 0) {
+
+            cuota = monto / plazo;
+
+        } else {
+
+            cuota = monto * tasaMensual /
+                (1 - Math.pow(1 + tasaMensual, -plazo));
+
+        }
+
+
+        // INITIAL VALUES
+
+        let saldo = monto;
+        let interesesTotales = 0;
+        let totalPagado = 0;
+
+        const tabla = document.getElementById("resultadoTabla");
+
+        tabla.innerHTML = "";
+
+
+        // GENERATE AMORTIZATION TABLE
+
+        for (let mes = 1; mes <= plazo; mes++) {
+
+            const saldoInicial = saldo;
+
+            const interes = saldoInicial * tasaMensual;
+
+            let abonoCapital = cuota - interes;
+
+            let cuotaActual = cuota;
+
+            // ADJUST FINAL PAYMENT
+
+            if (mes === plazo) {
+
+                abonoCapital = saldoInicial;
+                cuotaActual = abonoCapital + interes;
+
+            }
+
+            saldo = Math.max(0, saldoInicial - abonoCapital);
+
+            interesesTotales += interes;
+            totalPagado += cuotaActual;
+
+
+            // CREATE TABLE ROW
+
+            const fila = document.createElement("tr");
+
+            const valores = [
+                mes,
+                formatoMoneda.format(saldoInicial),
+                formatoMoneda.format(cuotaActual),
+                formatoMoneda.format(interes),
+                formatoMoneda.format(abonoCapital),
+                formatoMoneda.format(saldo)
+            ];
+
+            valores.forEach((valor, index) => {
+
+                const celda = document.createElement("td");
+
+                celda.textContent = valor;
+
+                if (index === 5) {
+                    celda.classList.add("balance-cell");
+                }
+
+                fila.appendChild(celda);
+
+            });
+
+            tabla.appendChild(fila);
+
+        }
+
+
+        // UPDATE SUMMARY
+
+        document.getElementById("cuota").textContent =
+            formatoMoneda.format(cuota);
+
+        document.getElementById("totalIntereses").textContent =
+            formatoMoneda.format(interesesTotales);
+
+        document.getElementById("totalPagar").textContent =
+            formatoMoneda.format(totalPagado);
+
+        document.getElementById("tasaMensual").textContent =
+            (tasaMensual * 100).toFixed(4) + "%";
+
+        document.getElementById("plazoResumen").textContent =
+            plazo + " months";
+
+        document.getElementById("capitalResumen").textContent =
+            formatoMoneda.format(monto);
+
+        document.getElementById("interesTabla").textContent =
+            formatoMoneda.format(interesesTotales);
+
+        document.getElementById("pagosTabla").textContent =
+            formatoMoneda.format(totalPagado);
+
+
+        // SHOW RESULTS
+
+        document.getElementById("summary").style.display = "block";
+
+        document.getElementById("tableSection").style.display = "block";
+
+        // SCROLL TO RESULTS
+
+        document.getElementById("summary").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+
+
+    // RESET SIMULATOR
+
+    function reiniciar() {
+
+        document.getElementById("monto").value = "";
+        document.getElementById("tasa").value = "";
+        document.getElementById("tipoTasa").value = "EA";
+        document.getElementById("plazo").value = "";
+
+        document.getElementById("resultadoTabla").innerHTML = "";
+
+        document.getElementById("summary").style.display = "none";
+
+        document.getElementById("tableSection").style.display = "none";
+
+        document.getElementById("error").style.display = "none";
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+</script>
 
 </body>
 </html>
+
